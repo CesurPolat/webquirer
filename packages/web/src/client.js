@@ -68,7 +68,7 @@ function renderQuestions(questionList) {
     if (!fields || section !== currentSection) {
       currentSection = section;
       groupIndex += 1;
-      const group = createQuestionGroup(section, groupIndex);
+      const group = createQuestionGroup(groupIndex);
       fields = group.querySelector('.question-section__fields');
       questions.append(group);
 
@@ -91,17 +91,10 @@ function renderQuestions(questionList) {
   }
 }
 
-function createQuestionGroup(title, index) {
+function createQuestionGroup(index) {
   const section = document.createElement('section');
   section.className = 'question-section';
   section.id = 'form-section-' + index;
-
-  if (title) {
-    const heading = document.createElement('h2');
-    heading.className = 'question-section__title';
-    heading.textContent = title;
-    section.append(heading);
-  }
 
   const fields = document.createElement('div');
   fields.className = 'question-section__fields';

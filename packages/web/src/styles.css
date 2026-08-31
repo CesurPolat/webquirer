@@ -202,16 +202,6 @@ h1 {
   scroll-margin-top: 12px;
 }
 
-.question-section__title {
-  margin: 0;
-  padding-bottom: 10px;
-  color: var(--muted);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-}
-
 .question-section__fields {
   display: grid;
   gap: 20px;
