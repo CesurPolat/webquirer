@@ -268,7 +268,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   min-height: var(--footer-height);
-  margin: auto 0 0;
+  margin: auto 0 12px;
   padding: 0 30px;
   background: var(--surface);
   border-top: 1px solid var(--border);
@@ -339,7 +339,7 @@ h1 {
   display: grid;
   align-content: center;
   min-height: var(--footer-height);
-  margin-top: auto;
+  margin: auto 0 12px;
   padding: 16px;
   border-top: 1px solid var(--border);
 }
