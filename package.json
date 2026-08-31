@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A proof of concept for collecting CLI prompts in a browser.",
+  "description": "A browser-based form interface for CLI prompts.",
   "exports": "./packages/cli/src/index.mjs",
   "scripts": {
     "demo": "node demo.mjs",

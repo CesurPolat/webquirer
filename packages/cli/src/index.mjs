@@ -25,7 +25,7 @@ function printFormLink(url) {
 
   console.log('');
   console.log(cyan + '  ┌─ Webquirer ──────────────────────┐' + reset);
-  console.log(cyan + '  │' + reset + '  ✦  ' + blue + 'Browser form is ready' + reset + '          ' + cyan + '│' + reset);
+  console.log(cyan + '  │' + reset + '  ✦  ' + blue + 'Browser form is ready' + reset + '        ' + cyan + '│' + reset);
   console.log(cyan + '  └──────────────────────────────────┘' + reset);
   console.log('  ' + blue + '→ Open:' + reset + ' ' + clickableUrl);
   console.log(dim + '  Waiting for your response…' + reset);
