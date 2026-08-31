@@ -20,11 +20,8 @@ export function renderWebApp(title, sessionId) {
       </header>
 
       <div class="settings-layout">
-        <aside class="settings-nav" aria-label="Form settings">
-          <a class="settings-nav__item settings-nav__item--active" href="#form-fields">⌘ <span>Form</span></a>
-          <a class="settings-nav__item" href="#form-fields">◫ <span>Fields</span></a>
-          <a class="settings-nav__item" href="#form-fields">◌ <span>Validation</span></a>
-          <a class="settings-nav__item" href="#form-fields">↗ <span>Behaviour</span></a>
+        <aside class="settings-nav" aria-label="Form sections">
+          <nav id="section-nav" class="section-nav"></nav>
           <div class="theme-picker" role="group" aria-label="Theme">
             <div class="theme-picker__controls">
               <button class="theme-button" type="button" data-theme-choice="light" aria-label="Use light theme" title="Light theme">

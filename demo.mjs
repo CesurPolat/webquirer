@@ -8,19 +8,43 @@ try {
         type: 'input',
         name: 'name',
         message: 'Project name',
+        section: 'Project details',
         required: true
+      },
+      {
+        type: 'input',
+        name: 'description',
+        message: 'Description',
+        section: 'Project details',
+        default: 'A new Webquirer project'
       },
       {
         type: 'select',
         name: 'stack',
         message: 'Stack',
+        section: 'Technology',
         choices: ['React', 'Vue', 'Svelte'],
         default: 'React'
+      },
+      {
+        type: 'select',
+        name: 'packageManager',
+        message: 'Package manager',
+        section: 'Technology',
+        choices: ['npm', 'pnpm', 'yarn'],
+        default: 'npm'
+      },
+      {
+        type: 'password',
+        name: 'registryToken',
+        message: 'Registry token',
+        section: 'Publishing'
       },
       {
         type: 'confirm',
         name: 'deploy',
         message: 'Deploy after creation?',
+        section: 'Publishing',
         default: true
       }
     ]

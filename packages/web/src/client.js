@@ -10,6 +10,9 @@ const cancelButton = document.querySelector('#cancel-button');
 const themeButtons = document.querySelectorAll('[data-theme-choice]');
 const loadingState = document.querySelector('#loading-state');
 const settingsContent = document.querySelector('.settings-content');
+const settingsLayout = document.querySelector('.settings-layout');
+const settingsNav = document.querySelector('.settings-nav');
+const sectionNav = document.querySelector('#section-nav');
 
 initializeTheme();
 start();
@@ -54,9 +57,71 @@ async function getSession() {
 }
 
 function renderQuestions(questionList) {
+  let currentSection;
+  let fields;
+  let groupIndex = 0;
+
   for (const question of questionList) {
-    questions.append(createField(question));
+    const section = question.section || '';
+
+    if (!fields || section !== currentSection) {
+      currentSection = section;
+      groupIndex += 1;
+      const group = createQuestionGroup(section, groupIndex);
+      fields = group.querySelector('.question-section__fields');
+      questions.append(group);
+
+      if (section) sectionNav.append(createSectionLink(section, group.id));
+    }
+
+    fields.append(createField(question));
   }
+
+  if (!sectionNav.children.length) {
+    settingsNav.hidden = true;
+    settingsLayout.classList.add('settings-layout--single');
+  }
+}
+
+function createQuestionGroup(title, index) {
+  const section = document.createElement('section');
+  section.className = 'question-section';
+  section.id = 'form-section-' + index;
+
+  if (title) {
+    const heading = document.createElement('h2');
+    heading.className = 'question-section__title';
+    heading.textContent = title;
+    section.append(heading);
+  }
+
+  const fields = document.createElement('div');
+  fields.className = 'question-section__fields';
+  section.append(fields);
+  return section;
+}
+
+function createSectionLink(title, targetId) {
+  const link = document.createElement('a');
+  link.className = 'settings-nav__item';
+  link.href = '#' + targetId;
+  link.textContent = title;
+
+  if (!sectionNav.children.length) {
+    link.classList.add('settings-nav__item--active');
+    link.setAttribute('aria-current', 'true');
+  }
+
+  link.addEventListener('click', () => {
+    for (const item of sectionNav.querySelectorAll('.settings-nav__item')) {
+      const active = item === link;
+      item.classList.toggle('settings-nav__item--active', active);
+      if (active) item.setAttribute('aria-current', 'true');
+      else item.removeAttribute('aria-current');
+    }
+  });
+
+  return link;
 }
 
 function createField(question) {

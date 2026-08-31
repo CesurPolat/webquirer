@@ -22,7 +22,7 @@ import { inquire } from './packages/cli/src/index.mjs';
 const answers = await inquire({
   title: 'Project setup',
   questions: [
-    { name: 'name', message: 'Project name', required: true },
+    { name: 'name', message: 'Project name', section: 'Project details', required: true },
     {
       type: 'select',
       name: 'stack',
@@ -34,7 +34,9 @@ const answers = await inquire({
 });
 ```
 
-Supported field types: `input`, `password`, `select`, and `confirm`.
+Supported field types: `input`, `password`, `select`, and `confirm`. Add the
+same `section` label to consecutive questions to render them under a shared
+section heading.
 
 ## Structure
 
