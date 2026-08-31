@@ -36,7 +36,13 @@ export function renderWebApp(title, sessionId) {
         </aside>
 
         <section class="settings-content">
-          <form id="webquirer-form">
+          <section id="loading-state" class="state-panel" aria-live="polite">
+            <span class="state-spinner" aria-hidden="true"></span>
+            <h2>Loading form</h2>
+            <p>Preparing your local Webquirer session…</p>
+          </section>
+
+          <form id="webquirer-form" hidden>
             <div id="questions" class="questions"></div>
 
             <p id="form-error" class="form-error" role="alert"></p>

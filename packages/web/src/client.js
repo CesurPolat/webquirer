@@ -1,13 +1,15 @@
 const card = document.querySelector('.form-card');
-const sessionId = card.dataset.sessionId;
-const sessionApi = '/api/sessions/' + sessionId;
+const sessionApi = '/api/sessions/' + card.dataset.sessionId;
 
 const form = document.querySelector('#webquirer-form');
 const title = document.querySelector('#form-title');
 const questions = document.querySelector('#questions');
 const errorMessage = document.querySelector('#form-error');
+const submitButton = form.querySelector('[type="submit"]');
 const cancelButton = document.querySelector('#cancel-button');
 const themeSelect = document.querySelector('#theme-select');
+const loadingState = document.querySelector('#loading-state');
+const settingsContent = document.querySelector('.settings-content');
 
 initializeTheme();
 start();
@@ -29,8 +31,10 @@ async function start() {
     const config = await getSession();
     title.textContent = config.title;
     renderQuestions(config.questions);
+    loadingState.hidden = true;
+    form.hidden = false;
   } catch (error) {
-    showError(error);
+    renderState('Unable to load the form', error.message, 'error');
   }
 }
 
@@ -122,11 +126,11 @@ function requiredMarker(question) {
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-  setBusy(true);
+  setBusy(true, 'submit');
 
   try {
     await send('/answers', collectAnswers());
-    renderCompletion('Done', 'You can return to your terminal.');
+    renderCompletion('Done', 'You can return to your terminal.', 'success');
   } catch (error) {
     showError(error);
     setBusy(false);
@@ -134,11 +138,11 @@ form.addEventListener('submit', async (event) => {
 });
 
 cancelButton.addEventListener('click', async () => {
-  setBusy(true);
+  setBusy(true, 'cancel');
 
   try {
     await send('/cancel', {});
-    renderCompletion('Cancelled', 'You can return to your terminal.');
+    renderCompletion('Cancelled', 'You can return to your terminal.', 'cancelled');
   } catch (error) {
     showError(error);
     setBusy(false);
@@ -167,38 +171,83 @@ async function send(path, payload) {
   return data;
 }
 
-function setBusy(isBusy) {
+function setBusy(isBusy, action) {
   for (const button of form.querySelectorAll('button')) {
     button.disabled = isBusy;
   }
+  submitButton.textContent = isBusy && action === 'submit' ? 'Submitting…' : 'Continue';
+  cancelButton.textContent = isBusy && action === 'cancel' ? 'Cancelling…' : 'Cancel';
 }
 
 function showError(error) {
   errorMessage.textContent = error.message;
 }
 
-function renderCompletion(heading, message) {
-  card.innerHTML =
-    '<section class="completion">' +
-      '<h1>' + heading + '</h1>' +
-      '<p>' + message + '</p>' +
-      '<button class="button button--secondary" type="button" id="close-tab-button">Close tab</button>' +
-      '<p id="close-hint" class="close-hint" hidden>You can close this tab manually.</p>' +
-    '</section>';
+function renderCompletion(heading, message, type) {
+  renderState(heading, message, type);
 
-  document.querySelector('#close-tab-button').addEventListener('click', closeTab);
+  const panel = settingsContent.querySelector('.state-panel');
+  const closeButton = document.createElement('button');
+  closeButton.className = 'button button--secondary';
+  closeButton.type = 'button';
+  closeButton.textContent = 'Close tab';
+  closeButton.addEventListener('click', closeTab);
+  panel.append(closeButton);
 
-  // Browsers only allow this when the page was opened by script.
-  // It is harmless to try; the visible close button remains as a fallback.
-  setTimeout(closeTab, 700);
+  const closeHint = document.createElement('p');
+  closeHint.id = 'close-hint';
+  closeHint.className = 'close-hint';
+  closeHint.hidden = true;
+  closeHint.textContent = 'You can close this tab manually.';
+  panel.append(closeHint);
+
+  const countdown = document.createElement('p');
+  countdown.className = 'close-countdown';
+  countdown.innerHTML = 'Closing this tab in <strong>5</strong>s…';
+  panel.append(countdown);
+
+  // This succeeds only for tabs the browser permits scripts to close.
+  startCloseCountdown(countdown);
+}
+
+function renderState(heading, message, type) {
+  settingsContent.replaceChildren();
+
+  const panel = document.createElement('section');
+  panel.className = 'state-panel state-panel--' + type;
+
+  const icon = document.createElement('span');
+  icon.className = 'state-icon';
+  icon.textContent = type === 'success' ? '✓' : type === 'cancelled' ? '—' : '!';
+
+  const headingElement = document.createElement('h2');
+  headingElement.textContent = heading;
+
+  const messageElement = document.createElement('p');
+  messageElement.textContent = message;
+
+  panel.append(icon, headingElement, messageElement);
+  settingsContent.append(panel);
 }
 
 function closeTab() {
   window.close();
 
-  // If the browser rejects window.close(), give the user a clear fallback.
   setTimeout(() => {
     const hint = document.querySelector('#close-hint');
     if (hint) hint.hidden = false;
   }, 150);
+}
+
+function startCloseCountdown(countdown) {
+  let remaining = 5;
+  const timer = setInterval(() => {
+    remaining -= 1;
+    countdown.innerHTML = 'Closing this tab in <strong>' + remaining + '</strong>s…';
+
+    if (remaining === 0) {
+      clearInterval(timer);
+      closeTab();
+    }
+  }, 1000);
 }
