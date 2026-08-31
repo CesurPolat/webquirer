@@ -9,6 +9,7 @@ try {
         name: 'name',
         message: 'Project name',
         section: 'Project details',
+        sectionIcon: '◫',
         required: true
       },
       {
@@ -23,6 +24,7 @@ try {
         name: 'stack',
         message: 'Stack',
         section: 'Technology',
+        sectionIcon: '◌',
         choices: ['React', 'Vue', 'Svelte'],
         default: 'React'
       },
@@ -38,7 +40,8 @@ try {
         type: 'password',
         name: 'registryToken',
         message: 'Registry token',
-        section: 'Publishing'
+        section: 'Publishing',
+        sectionIcon: '↗'
       },
       {
         type: 'confirm',

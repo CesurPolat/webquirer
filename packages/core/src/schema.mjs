@@ -9,6 +9,7 @@ export function normalizeForm(options) {
     names.add(question.name);
     const normalized = { ...question, type: question.type ?? 'input' };
     if (normalized.section != null && (typeof normalized.section !== 'string' || !normalized.section.trim())) throw new TypeError(`Section for "${normalized.name}" must be text.`);
+    if (normalized.sectionIcon != null && (typeof normalized.sectionIcon !== 'string' || !normalized.sectionIcon.trim())) throw new TypeError(`Section icon for "${normalized.name}" must be text.`);
     if (!supportedTypes.has(normalized.type)) throw new TypeError(`Unsupported type: ${normalized.type}`);
     if (normalized.type === 'select' && (!Array.isArray(normalized.choices) || normalized.choices.length === 0)) throw new TypeError(`Select question "${normalized.name}" needs choices.`);
     return normalized;

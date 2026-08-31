@@ -60,9 +60,10 @@ function renderQuestions(questionList) {
   let currentSection;
   let fields;
   let groupIndex = 0;
+  const hasSections = questionList.some((question) => Boolean(question.section));
 
   for (const question of questionList) {
-    const section = question.section || '';
+    const section = hasSections ? question.section || 'General' : '';
 
     if (!fields || section !== currentSection) {
       currentSection = section;
@@ -71,7 +72,7 @@ function renderQuestions(questionList) {
       fields = group.querySelector('.question-section__fields');
       questions.append(group);
 
-      if (section) sectionNav.append(createSectionLink(section, group.id));
+      if (section) sectionNav.append(createSectionLink(section, question.sectionIcon, group.id));
     }
 
     fields.append(createField(question));
@@ -80,6 +81,13 @@ function renderQuestions(questionList) {
   if (!sectionNav.children.length) {
     settingsNav.hidden = true;
     settingsLayout.classList.add('settings-layout--single');
+  } else {
+    const requestedSection = window.location.hash.slice(1);
+    const requestedElement = document.getElementById(requestedSection);
+    const initialSection = requestedElement?.classList.contains('question-section')
+      ? requestedSection
+      : sectionNav.querySelector('.settings-nav__item').hash.slice(1);
+    activateSection(initialSection);
   }
 }
 
@@ -101,27 +109,46 @@ function createQuestionGroup(title, index) {
   return section;
 }
 
-function createSectionLink(title, targetId) {
+function createSectionLink(title, icon, targetId) {
   const link = document.createElement('a');
   link.className = 'settings-nav__item';
   link.href = '#' + targetId;
-  link.textContent = title;
+
+  const iconElement = document.createElement('span');
+  iconElement.className = 'settings-nav__icon';
+  iconElement.setAttribute('aria-hidden', 'true');
+  iconElement.textContent = icon || '◌';
+
+  const label = document.createElement('span');
+  label.className = 'settings-nav__label';
+  label.textContent = title;
+  link.append(iconElement, label);
 
   if (!sectionNav.children.length) {
     link.classList.add('settings-nav__item--active');
     link.setAttribute('aria-current', 'true');
   }
 
-  link.addEventListener('click', () => {
-    for (const item of sectionNav.querySelectorAll('.settings-nav__item')) {
-      const active = item === link;
-      item.classList.toggle('settings-nav__item--active', active);
-      if (active) item.setAttribute('aria-current', 'true');
-      else item.removeAttribute('aria-current');
-    }
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.history.replaceState(null, '', link.hash);
+    activateSection(targetId);
   });
 
   return link;
+}
+
+function activateSection(targetId) {
+  for (const section of questions.querySelectorAll('.question-section')) {
+    section.hidden = section.id !== targetId;
+  }
+
+  for (const item of sectionNav.querySelectorAll('.settings-nav__item')) {
+    const active = item.hash === '#' + targetId;
+    item.classList.toggle('settings-nav__item--active', active);
+    if (active) item.setAttribute('aria-current', 'true');
+    else item.removeAttribute('aria-current');
+  }
 }
 
 function createField(question) {
