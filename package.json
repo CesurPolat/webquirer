@@ -1,0 +1,15 @@
+{
+  "name": "webquirer-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A proof of concept for collecting CLI prompts in a browser.",
+  "exports": "./packages/cli/src/index.mjs",
+  "scripts": {
+    "demo": "node demo.mjs",
+    "test:flow": "node test-flow.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
