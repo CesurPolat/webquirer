@@ -242,6 +242,32 @@ cancelButton.addEventListener('click', async () => {
   }
 });
 
+submitButton.addEventListener('click', (event) => {
+  if (focusFirstInvalidControl()) event.preventDefault();
+});
+
+form.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && focusFirstInvalidControl()) event.preventDefault();
+});
+
+function focusFirstInvalidControl() {
+  const invalidControl = Array.from(form.elements).find((control) =>
+    control.willValidate && !control.checkValidity()
+  );
+
+  if (!invalidControl) return false;
+
+  const section = invalidControl.closest('.question-section');
+  if (section) activateSection(section.id);
+
+  requestAnimationFrame(() => {
+    invalidControl.focus();
+    invalidControl.reportValidity();
+  });
+
+  return true;
+}
+
 function collectAnswers() {
   const answers = {};
   for (const control of form.elements) {
