@@ -4,7 +4,7 @@
  */
 export function renderWebApp(title, sessionId) {
   return `<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="system">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,20 +13,41 @@ export function renderWebApp(title, sessionId) {
   </head>
   <body>
     <main class="form-card" data-session-id="${escapeHtml(sessionId)}" aria-live="polite">
-      <p class="eyebrow">Webquirer · local session</p>
-      <h1 id="form-title">Loading form…</h1>
-      <p class="subtitle">Complete the fields below, then return to your terminal.</p>
+      <header class="form-header">
+        <p class="eyebrow">Webquirer · local session</p>
+        <h1 id="form-title">Loading form…</h1>
+        <p class="subtitle">Complete the fields below, then return to your terminal.</p>
+      </header>
 
-      <form id="webquirer-form">
-        <div id="questions" class="questions"></div>
+      <div class="settings-layout">
+        <aside class="settings-nav" aria-label="Form settings">
+          <a class="settings-nav__item settings-nav__item--active" href="#form-fields">⌘ <span>Form</span></a>
+          <a class="settings-nav__item" href="#form-fields">◫ <span>Fields</span></a>
+          <a class="settings-nav__item" href="#form-fields">◌ <span>Validation</span></a>
+          <a class="settings-nav__item" href="#form-fields">↗ <span>Behaviour</span></a>
+          <label class="theme-picker" for="theme-select">
+            <span>Theme</span>
+            <select id="theme-select">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </aside>
 
-        <div class="actions">
-          <button class="button button--primary" type="submit">Continue</button>
-          <button class="button button--secondary" type="button" id="cancel-button">Cancel</button>
-        </div>
+        <section class="settings-content">
+          <form id="webquirer-form">
+            <div id="questions" class="questions"></div>
 
-        <p id="form-error" class="form-error" role="alert"></p>
-      </form>
+            <p id="form-error" class="form-error" role="alert"></p>
+
+            <div class="actions">
+              <button class="button button--primary" type="submit">Continue</button>
+              <button class="button button--secondary" type="button" id="cancel-button">Cancel</button>
+            </div>
+          </form>
+        </section>
+      </div>
     </main>
 
     <script type="module" src="/assets/webquirer-client.js"></script>

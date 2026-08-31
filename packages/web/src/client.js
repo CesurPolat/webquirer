@@ -7,8 +7,22 @@ const title = document.querySelector('#form-title');
 const questions = document.querySelector('#questions');
 const errorMessage = document.querySelector('#form-error');
 const cancelButton = document.querySelector('#cancel-button');
+const themeSelect = document.querySelector('#theme-select');
 
+initializeTheme();
 start();
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('webquirer-theme') || 'system';
+  document.documentElement.dataset.theme = savedTheme;
+  themeSelect.value = savedTheme;
+
+  themeSelect.addEventListener('change', () => {
+    const theme = themeSelect.value;
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('webquirer-theme', theme);
+  });
+}
 
 async function start() {
   try {
