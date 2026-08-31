@@ -263,14 +263,40 @@ h1 {
   border-top: 1px solid var(--border);
 }
 
-.theme-picker select {
+.theme-picker__label {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.theme-picker__controls {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
   width: 100%;
-  padding: 5px 6px;
-  color: var(--ink);
-  font: inherit;
-  background: var(--surface);
+}
+
+.theme-button {
+  display: grid;
+  width: 36px;
+  height: 32px;
+  place-items: center;
+  color: var(--muted);
+  font: 18px/1 system-ui, sans-serif;
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: 5px;
+  cursor: pointer;
+}
+
+.theme-button[aria-pressed="true"] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: var(--primary);
+}
+
+.theme-button:focus-visible {
+  outline: 3px solid var(--primary-ring);
 }
 
 @media (max-width: 640px) {

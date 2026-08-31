@@ -7,7 +7,7 @@ const questions = document.querySelector('#questions');
 const errorMessage = document.querySelector('#form-error');
 const submitButton = form.querySelector('[type="submit"]');
 const cancelButton = document.querySelector('#cancel-button');
-const themeSelect = document.querySelector('#theme-select');
+const themeButtons = document.querySelectorAll('[data-theme-choice]');
 const loadingState = document.querySelector('#loading-state');
 const settingsContent = document.querySelector('.settings-content');
 
@@ -16,14 +16,22 @@ start();
 
 function initializeTheme() {
   const savedTheme = localStorage.getItem('webquirer-theme') || 'system';
-  document.documentElement.dataset.theme = savedTheme;
-  themeSelect.value = savedTheme;
+  setTheme(savedTheme);
 
-  themeSelect.addEventListener('change', () => {
-    const theme = themeSelect.value;
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('webquirer-theme', theme);
-  });
+  for (const button of themeButtons) {
+    button.addEventListener('click', () => {
+      const theme = button.dataset.themeChoice;
+      setTheme(theme);
+      localStorage.setItem('webquirer-theme', theme);
+    });
+  }
+}
+
+function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  for (const button of themeButtons) {
+    button.setAttribute('aria-pressed', String(button.dataset.themeChoice === theme));
+  }
 }
 
 async function start() {

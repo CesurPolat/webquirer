@@ -25,14 +25,19 @@ export function renderWebApp(title, sessionId) {
           <a class="settings-nav__item" href="#form-fields">◫ <span>Fields</span></a>
           <a class="settings-nav__item" href="#form-fields">◌ <span>Validation</span></a>
           <a class="settings-nav__item" href="#form-fields">↗ <span>Behaviour</span></a>
-          <label class="theme-picker" for="theme-select">
-            <span>Theme</span>
-            <select id="theme-select">
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </label>
+          <div class="theme-picker" role="group" aria-label="Theme">
+            <div class="theme-picker__controls">
+              <button class="theme-button" type="button" data-theme-choice="light" aria-label="Use light theme" title="Light theme">
+                <span aria-hidden="true">☀</span>
+              </button>
+              <button class="theme-button" type="button" data-theme-choice="system" aria-label="Use system theme" title="System theme">
+                <span aria-hidden="true">▣</span>
+              </button>
+              <button class="theme-button" type="button" data-theme-choice="dark" aria-label="Use dark theme" title="Dark theme">
+                <span aria-hidden="true">☾</span>
+              </button>
+            </div>
+          </div>
         </aside>
 
         <section class="settings-content">
