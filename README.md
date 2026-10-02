@@ -39,6 +39,14 @@ same `section` label to consecutive questions to render them under a shared
 section heading. Use `sectionIcon` on the first question in a section to add an
 icon to its navigation item.
 
+Select choices can be strings or objects with `name`, `value`, and an optional
+`description`. Questions may also provide a `validate(value, answers)` callback;
+it runs on the local server and returns field-level errors to the browser.
+
+For a single browser tab with multiple steps, use `inquireWizard({ questions,
+next })`. The `next` callback receives the current step and accumulated answers,
+and returns the next question list or `{ done: true, result }`.
+
 ## Structure
 
 ```text

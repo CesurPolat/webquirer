@@ -212,6 +212,42 @@ h1 {
   gap: 8px;
 }
 
+.menu-choices {
+  display: grid;
+  gap: 12px;
+}
+
+.menu-choices__value {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-choice {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: 16px 18px;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.menu-choice:hover,
+.menu-choice--active {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border-color: var(--primary);
+}
+
+.menu-choice__name { font-weight: 700; }
+.menu-choice__description { color: var(--muted); font-size: 13px; line-height: 1.4; }
+
 .field__label,
 .checkbox-field {
   font-weight: 650;

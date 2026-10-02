@@ -22,15 +22,59 @@ export async function createWebquirerServer() {
     if (!session) return send(404, JSON.stringify({ error: 'Unknown or closed session' }));
     if (url.pathname === `/s/${id}` && req.method === 'GET') return send(200, renderWebApp(session.form.title, id), 'text/html; charset=utf-8');
     if (url.pathname === `/api/sessions/${id}` && req.method === 'GET') return send(200, JSON.stringify(session.form));
-    if (req.method === 'POST' && action === 'answers') { try { const answers = validateAnswers(session.form.questions, JSON.parse(await readBody(req))); finish(id, null, answers); return send(200, JSON.stringify({ ok: true })); } catch (error) { return send(422, JSON.stringify({ error: error.message })); } }
+    if (req.method === 'POST' && action === 'answers') {
+      try {
+        const answers = await validateAnswers(session.form.questions, JSON.parse(await readBody(req)));
+        if (session.wizard) {
+          const allAnswers = { ...session.answers, ...answers };
+          const next = await session.next({ step: session.step, answers, allAnswers });
+          if (!next || next.done) {
+            finish(id, null, next?.result ?? allAnswers);
+            return send(200, JSON.stringify({ ok: true, done: true }));
+          }
+          session.answers = allAnswers;
+          session.step += 1;
+          session.form = normalizeForm({ title: next.title ?? session.form.title, questions: next.questions });
+          return send(200, JSON.stringify({ ok: true, done: false, form: session.form }));
+        }
+        finish(id, null, answers);
+        return send(200, JSON.stringify({ ok: true, done: true }));
+      } catch (error) {
+        return send(422, JSON.stringify({ error: error.message, ...(error.field ? { field: error.field } : {}) }));
+      }
+    }
     if (req.method === 'POST' && action === 'cancel') { finish(id, new Error('Browser form was cancelled.')); return send(200, JSON.stringify({ ok: true })); }
     return send(405, JSON.stringify({ error: 'Method not allowed' }));
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const { port } = server.address();
-  function finish(id, error, answers) { const session = sessions.get(id); if (!session) return; sessions.delete(id); error ? session.reject(error) : session.resolve(answers); }
+  function finish(id, error, answers) {
+    const session = sessions.get(id);
+    if (!session) return;
+    if (session.timer) clearTimeout(session.timer);
+    sessions.delete(id);
+    error ? session.reject(error) : session.resolve(answers);
+  }
   return {
-    createSession(options) { const form = normalizeForm(options); const id = randomUUID(); let resolve; let reject; const result = new Promise((res, rej) => { resolve = res; reject = rej; }); sessions.set(id, { form, resolve, reject }); return { id, url: `http://127.0.0.1:${port}/s/${id}`, result }; },
+    createSession(options) {
+      const form = normalizeForm(options); const id = randomUUID(); let resolve; let reject;
+      const result = new Promise((res, rej) => { resolve = res; reject = rej; });
+      const session = { form, resolve, reject };
+      sessions.set(id, session);
+      if (Number.isFinite(options.timeout) && options.timeout > 0) session.timer = setTimeout(() => finish(id, new Error('Webquirer session timed out.')), options.timeout);
+      return { id, url: `http://127.0.0.1:${port}/s/${id}`, result };
+    },
+    createWizardSession(options) {
+      if (!options || typeof options.next !== 'function') throw new TypeError('A wizard needs a next callback.');
+      const form = normalizeForm(options);
+      const id = randomUUID();
+      let resolve; let reject;
+      const result = new Promise((res, rej) => { resolve = res; reject = rej; });
+      const session = { form, resolve, reject, wizard: true, next: options.next, step: 0, answers: {} };
+      sessions.set(id, session);
+      if (Number.isFinite(options.timeout) && options.timeout > 0) session.timer = setTimeout(() => finish(id, new Error('Webquirer session timed out.')), options.timeout);
+      return { id, url: `http://127.0.0.1:${port}/s/${id}`, result };
+    },
     close() { for (const [id] of sessions) finish(id, new Error('Webquirer server closed.')); return new Promise(resolve => server.close(resolve)); }
   };
 }

@@ -57,6 +57,10 @@ async function getSession() {
 }
 
 function renderQuestions(questionList) {
+  questions.replaceChildren();
+  sectionNav.replaceChildren();
+  settingsNav.hidden = false;
+  settingsLayout.classList.remove('settings-layout--single');
   let currentSection;
   let fields;
   let groupIndex = 0;
@@ -147,7 +151,56 @@ function activateSection(targetId) {
 function createField(question) {
   return question.type === 'confirm'
     ? createCheckboxField(question)
+    : question.presentation === 'buttons'
+      ? createButtonChoices(question)
     : createStandardField(question);
+}
+
+function createButtonChoices(question) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'menu-choices';
+  wrapper.setAttribute('role', 'radiogroup');
+  wrapper.setAttribute('aria-label', question.message);
+
+  const label = document.createElement('div');
+  label.className = 'field__label';
+  label.append(question.message, requiredMarker(question));
+  wrapper.append(label);
+
+  const hidden = document.createElement('input');
+  hidden.type = 'text';
+  hidden.name = question.name;
+  hidden.required = Boolean(question.required);
+  hidden.tabIndex = -1;
+  hidden.className = 'menu-choices__value';
+  wrapper.append(hidden);
+
+  for (const choice of question.choices) {
+    const item = typeof choice === 'string' ? { name: choice, value: choice } : choice;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'menu-choice';
+    button.setAttribute('role', 'radio');
+    button.setAttribute('aria-checked', 'false');
+    button.innerHTML = '<span class="menu-choice__name"></span><span class="menu-choice__description"></span>';
+    button.querySelector('.menu-choice__name').textContent = item.name;
+    button.querySelector('.menu-choice__description').textContent = item.description || '';
+    button.querySelector('.menu-choice__description').hidden = !item.description;
+    button.addEventListener('click', () => {
+      hidden.value = item.value;
+      for (const sibling of wrapper.querySelectorAll('.menu-choice')) {
+        const active = sibling === button;
+        sibling.classList.toggle('menu-choice--active', active);
+        sibling.setAttribute('aria-checked', String(active));
+      }
+    });
+    wrapper.append(button);
+  }
+  const defaultChoice = question.choices.find((choice) =>
+    (typeof choice === 'string' ? choice : choice.value) === question.default
+  );
+  if (defaultChoice) wrapper.querySelector('.menu-choice').click();
+  return wrapper;
 }
 
 function createStandardField(question) {
@@ -187,9 +240,15 @@ function createSelect(question) {
 
   for (const choice of question.choices) {
     const option = document.createElement('option');
-    option.value = choice;
-    option.textContent = choice;
-    option.selected = choice === question.default;
+    const value = typeof choice === 'string' ? choice : choice.value;
+    option.value = value;
+    option.textContent = typeof choice === 'string'
+      ? choice
+      : choice.description
+        ? choice.name + ' — ' + choice.description
+        : choice.name;
+    if (typeof choice === 'object' && choice.description) option.title = choice.description;
+    option.selected = value === question.default;
     select.append(option);
   }
   return select;
@@ -222,7 +281,14 @@ form.addEventListener('submit', async (event) => {
   setBusy(true, 'submit');
 
   try {
-    await send('/answers', collectAnswers());
+    const result = await send('/answers', collectAnswers());
+    if (result.done === false) {
+      title.textContent = result.form.title;
+      renderQuestions(result.form.questions);
+      errorMessage.textContent = '';
+      setBusy(false);
+      return;
+    }
     renderCompletion('Done', 'You can return to your terminal.', 'success');
   } catch (error) {
     showError(error);
@@ -286,7 +352,11 @@ async function send(path, payload) {
     body: JSON.stringify(payload)
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Something went wrong.');
+  if (!response.ok) {
+    const error = new Error(data.error || 'Something went wrong.');
+    error.field = data.field;
+    throw error;
+  }
   return data;
 }
 
@@ -300,6 +370,14 @@ function setBusy(isBusy, action) {
 
 function showError(error) {
   errorMessage.textContent = error.message;
+  if (error.field) {
+    const invalidControl = form.elements.namedItem(error.field);
+    if (invalidControl) {
+      const section = invalidControl.closest('.question-section');
+      if (section) activateSection(section.id);
+      invalidControl.focus();
+    }
+  }
 }
 
 function renderCompletion(heading, message, type) {

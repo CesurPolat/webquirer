@@ -1,7 +1,7 @@
 {
-  "name": "webquirer-prototype",
+  "name": "webquirer",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "A browser-based form interface for CLI prompts.",
   "exports": "./packages/cli/src/index.mjs",

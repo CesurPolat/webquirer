@@ -7,11 +7,25 @@ export async function inquire(options) {
     const session = server.createSession(options);
     printFormLink(session.url);
     options.onOpen?.(session.url);
-    if (options.open !== false) openBrowser(session.url);
+    if (options.open !== false) await openBrowser(session.url);
     return await session.result;
   } finally { await server.close(); }
 }
-function openBrowser(url) { const command = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`; exec(command, { windowsHide: true }); }
+
+export async function inquireWizard(options) {
+  const server = await createWebquirerServer();
+  try {
+    const session = server.createWizardSession(options);
+    printFormLink(session.url);
+    options.onOpen?.(session.url);
+    if (options.open !== false) await openBrowser(session.url);
+    return await session.result;
+  } finally { await server.close(); }
+}
+function openBrowser(url) {
+  const command = process.platform === 'win32' ? `start "" "${url}"` : process.platform === 'darwin' ? `open "${url}"` : `xdg-open "${url}"`;
+  return new Promise((resolve, reject) => exec(command, { windowsHide: true }, (error) => error ? reject(error) : resolve()));
+}
 
 function printFormLink(url) {
   const terminal = process.stdout.isTTY;
