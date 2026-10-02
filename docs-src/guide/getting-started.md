@@ -19,7 +19,7 @@ The demo is defined in `demo.mjs`. It collects project details, technology choic
 ## Use in an application
 
 ```js
-import { inquire } from 'webquirer';
+import { inquire } from '@cesur_polat/webquirer';
 
 const answers = await inquire({
   title: 'Create a project',

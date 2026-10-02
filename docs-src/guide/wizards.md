@@ -3,7 +3,7 @@
 Use `inquireWizard()` when later questions depend on earlier answers. The `next` callback receives the current step and accumulated answers, then returns the next form or finishes the wizard.
 
 ```js
-import { inquireWizard } from 'webquirer';
+import { inquireWizard } from '@cesur_polat/webquirer';
 
 const result = await inquireWizard({
   title: 'Create a project',

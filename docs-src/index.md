@@ -33,7 +33,7 @@ Webquirer is useful when a terminal prompt is too constrained for a richer setup
 ## Quick example
 
 ```js
-import { inquire } from 'webquirer';
+import { inquire } from '@cesur_polat/webquirer';
 
 const answers = await inquire({
   title: 'Project setup',

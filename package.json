@@ -1,10 +1,13 @@
 {
-  "name": "webquirer",
+  "name": "@cesur_polat/webquirer",
   "version": "0.1.0",
   "private": false,
   "type": "module",
   "description": "A browser-based form interface for CLI prompts.",
   "exports": "./packages/cli/src/index.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "demo": "node demo.mjs",
     "test:flow": "node test-flow.mjs",
