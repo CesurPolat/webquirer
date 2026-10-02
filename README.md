@@ -2,6 +2,10 @@
 
 Webquirer lets CLI applications collect answers through a browser-based form.
 
+Read the full documentation at the VitePress site. Markdown sources live in
+`docs-src/`; run `npm install` followed by `npm run docs:dev` to work on it
+locally, or `npm run docs:build` to generate the static site in `docs/`.
+
 ```text
 CLI → local server → browser form → validated answers → CLI
 ```

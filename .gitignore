@@ -1,2 +1,6 @@
 # Local prototype runner
 demo.mjs
+
+# Dependencies and generated documentation output
+node_modules/
+docs-src/.vitepress/dist/

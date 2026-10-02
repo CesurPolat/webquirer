@@ -7,9 +7,18 @@
   "exports": "./packages/cli/src/index.mjs",
   "scripts": {
     "demo": "node demo.mjs",
-    "test:flow": "node test-flow.mjs"
+    "test:flow": "node test-flow.mjs",
+    "docs:dev": "vitepress dev docs-src",
+    "docs:build": "vitepress build docs-src --outDir docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
   },
   "engines": {
     "node": ">=20"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
   }
 }
